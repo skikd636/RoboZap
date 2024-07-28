@@ -12,6 +12,9 @@ import json
 import requests
 from datetime import datetime
 from six import binary_type
+from sys import platform
+
+EXT = '.bat' if platform == 'win32' else '.sh'
 
 def write_report(file_path, report):
     with open(file_path, mode='wb') as f:
@@ -57,7 +60,7 @@ class RoboZap(object):
         | start headless zap  |  path  |  extra_zap_params **optional**  |
 
         """
-        self.zap_exe = os.path.join(path, "zap.sh")
+        self.zap_exe = os.path.join(path, f"zap{EXT}")
         params = [
             self.zap_exe, 
             '-daemon',
@@ -86,9 +89,7 @@ class RoboZap(object):
 
         """
         try:
-            cmd = path + "zap.sh -config api.disablekey=true -port {0}".format(
-                self.port
-            )
+            cmd = path + f"zap{EXT} -config api.disablekey=true -port {self.port}"
             print(cmd)
             subprocess.Popen(cmd.split(" "), stdout=open(os.devnull, "w"))
             time.sleep(10)
@@ -277,7 +278,7 @@ class RoboZap(object):
             time.sleep(2)
             return spider_id
         except Exception as e:
-            print((e.message))
+            print(e)
 
     def zap_spider_status(self, spider_id):
         """
@@ -314,7 +315,7 @@ class RoboZap(object):
             self.zap.ajaxSpider.scan(url=url, contextname=contextname, inscope=inscope, subtreeonly=subtreeonly )
             time.sleep(2)
         except Exception as e:
-            print((e.message))    
+            print(e)
 
     def zap_ajax_spider_status(self):
         """
@@ -376,7 +377,7 @@ class RoboZap(object):
             time.sleep(2)
             return scan_id
         except Exception as e:
-            print(e.message)
+            print(e)
 
     def zap_scan_status(self, scan_id):
         """
